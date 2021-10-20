@@ -30,6 +30,8 @@ public class OrderService {
 	private ProductService productService;
 	@Autowired
 	private InventoryService inventoryService;
+	@Autowired
+	private EmailService emailService;
 	private static Date CURRENT_DATETIME = new Date(System.currentTimeMillis());
 
 	public List<Order> allOrders() {
@@ -86,11 +88,11 @@ public class OrderService {
 			ResponseEntity<Inventory> inventoryResonse = inventoryService.getProductUnits(order.getProductId());
 			if (inventoryResonse.getStatusCode() == HttpStatus.OK) {
 				if (order.getQuantity() > inventoryResonse.getBody().getUnits()) {
-					throw new OrderServiceException(String.format("Availble stock for product Id=%s is less than ",
+					throw new OrderServiceException(String.format("Availble stock for product Id=%s is less than %d",
 							order.getProductId(), order.getQuantity()));
+				} else {
+					throw new OrderServiceException("Stock not available for the productId");
 				}
-			} else {
-				throw new OrderServiceException("Unable to fetch stocks from inventory");
 			}
 		});
 	}
@@ -114,5 +116,9 @@ public class OrderService {
 			sum = sum.add(amt);
 		}
 		return sum;
+	}
+
+	public void sendEmailRequest(OrderRequest orderRequest,Order order) {
+		emailService.sendRequest(orderRequest.getEmailId(),order);
 	}
 }

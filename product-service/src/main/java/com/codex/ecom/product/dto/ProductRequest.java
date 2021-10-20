@@ -15,5 +15,6 @@ public class ProductRequest {
 	private String name;
 	private String category;
 	private BigDecimal price;
+	private int units;
 	Boolean activeIndicator;
 }

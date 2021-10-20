@@ -11,7 +11,10 @@ import com.codex.ecom.product.exception.ProductNotFoundException;
 import com.codex.ecom.product.model.Product;
 import com.codex.ecom.product.repository.ProductRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
@@ -22,6 +25,7 @@ public class ProductService {
 	}
 
 	public Product findById(String productId) {
+		log.info("Fetching product for productId: {}", productId);
 		return productRepository.findById(productId).orElseThrow(
 				() -> new ProductNotFoundException(String.format("Product for the id %s is not available", productId)));
 	}
