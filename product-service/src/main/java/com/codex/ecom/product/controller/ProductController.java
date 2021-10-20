@@ -24,12 +24,15 @@ import com.codex.ecom.product.model.Inventory;
 import com.codex.ecom.product.model.Product;
 import com.codex.ecom.product.service.ProductService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/product")
+@Slf4j
 public class ProductController {
 	@Autowired
 	private ProductService productService;
-	
+
 	@Autowired
 	private InventoryFeignClient inventoryFeignClient;
 
@@ -44,10 +47,11 @@ public class ProductController {
 	}
 
 	@PostMapping
-	public ResponseEntity<ProductResponse> createProduct(@NotNull @RequestBody ProductRequest productRequest,
-			@RequestParam int units) {
+	public ResponseEntity<ProductResponse> createProduct(@NotNull @RequestBody ProductRequest productRequest) {
+		log.info("payload received-->{}",productRequest);
 		String productId = productService.create(productRequest).getProductId();
-		InventoryRequest inventoryRequest = InventoryRequest.builder().productId(productId).units(units).build();
+		InventoryRequest inventoryRequest = InventoryRequest.builder().productId(productId)
+				.units(productRequest.getUnits()).build();
 		ResponseEntity<Inventory> inventory = inventoryFeignClient.createStockUnits(inventoryRequest);
 		if (inventory.getStatusCode() == HttpStatus.CREATED) {
 			return new ResponseEntity<>(

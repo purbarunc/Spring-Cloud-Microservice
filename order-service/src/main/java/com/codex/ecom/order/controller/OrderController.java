@@ -39,8 +39,9 @@ public class OrderController {
 	@PostMapping
 	public ResponseEntity<OrderResponse> createOrder(@NotNull @RequestBody OrderRequest orderRequest) {
 		orderService.validateRequest(orderRequest);
-		String orderId = orderService.createOrder(orderRequest).getOrderId();
-		return new ResponseEntity<>(new OrderResponse(String.format("Order id=%s has been created", orderId)),
+		Order order = orderService.createOrder(orderRequest);
+		orderService.sendEmailRequest(orderRequest,order);
+		return new ResponseEntity<>(new OrderResponse(String.format("Order id=%s has been created", order.getOrderId())),
 				HttpStatus.CREATED);
 	}
 

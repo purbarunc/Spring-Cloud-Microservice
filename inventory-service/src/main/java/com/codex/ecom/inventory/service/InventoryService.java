@@ -14,7 +14,10 @@ import com.codex.ecom.inventory.model.Inventory;
 import com.codex.ecom.inventory.repository.InventoryRepository;
 import com.codex.ecom.inventory.response.Product;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class InventoryService {
 	@Autowired
 	private InventoryRepository inventoryRepository;
@@ -29,6 +32,7 @@ public class InventoryService {
 	}
 
 	public Inventory getInventory(String productId) {
+		log.info("Getting Stock Units for productId: {}",productId);
 		return inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryServiceException(
 				String.format("Product for the id %s is not available", productId)));
 	}
@@ -38,6 +42,7 @@ public class InventoryService {
 		Inventory inventory = Inventory.builder().skuCode(currentInventory.getSkuCode()).updatedDate(CURRENT_DATETIME)
 				.productId(inventoryRequest.getProductId())
 				.units(currentInventory.getUnits() - inventoryRequest.getUnits()).build();
+		log.info("Deducting Stock Units for productId: {} with sku-code: {}",inventory.getProductId(),inventory.getSkuCode());
 		return inventoryRepository.save(inventory);
 	}
 
